@@ -28,6 +28,7 @@ public class Hangman implements KeyListener {
 
 	int lives;
 	int wordsSolved;
+	int number;
 
 	Hangman() {
 
@@ -61,21 +62,22 @@ public class Hangman implements KeyListener {
 		Hangman h = new Hangman();
 
 		ArrayList<String> list = new ArrayList<String>();
-		int number = Integer.parseInt(JOptionPane.showInputDialog("Enter a number: "));
+		h.number = Integer.parseInt(JOptionPane.showInputDialog("Enter a number: "));
 
 		try {
 
 			BufferedReader br;
 
 			Random rand = new Random();
-			int ran = rand.nextInt(3999);
+			int ran = rand.nextInt(2999);
 
-			for (int i = 0; i < number; i++) {
+			for (int i = 0; i < h.number; i++) {
 				br = new BufferedReader(new FileReader("src/dictionary.txt"));
 				for (int j = 0; j < ran; j++) {
 					br.readLine();
-					list.add(br.readLine());
 				}
+				list.add(br.readLine());
+				ran = rand.nextInt(2999);
 				br.close();
 			}
 
@@ -85,31 +87,40 @@ public class Hangman implements KeyListener {
 			e.printStackTrace();
 		}
 
-		int num = list.size();
 		for (int i = 0; i < list.size(); i++) {
 			h.stack.push(list.get(i));
 		}
 
-		if (h.stack.size() == num) {
-			h.setup();
-		}
+		h.setup();
 
 	}
 
 	void setup() {
 
-		word = stack.pop();
-
-		for (int i = 0; i < word.length(); i++) {
-			label += "_";
+		if (!stack.isEmpty()) {
+			word = stack.pop();
+	
+			for (int i = 0; i < word.length(); i++) {
+				label += "_";
+			}
+	
+			label1.setText("guess a letter");
+			wordLabel.setText(label);
+			label2.setText("you have " + lives + " lives left");
+			label3.setText("you have solved " + wordsSolved + " words");
+	
+			frame.pack();
+		} else if (number <= 3){
+			JOptionPane.showMessageDialog(null, "You win, but you only had " + number + " words");
+		} else if (number == 4 || number == 5) {
+			JOptionPane.showMessageDialog(null, "You win, with " + number + " words. eh");
+		} else if (number > 5 && number < 10) {
+			JOptionPane.showMessageDialog(null, "You win and solved " + number + "words");
+		} else if (number >= 10 && number < 20){
+			JOptionPane.showMessageDialog(null, "You win! Impressive, you solved " + number + " words");
+		} else if (number > 20) {
+			JOptionPane.showMessageDialog(null, "YAY! you solved " + number + " words! YOU WIN!!");
 		}
-
-		label1.setText("guess a letter");
-		wordLabel.setText(label);
-		label2.setText("you have " + lives + " lives left");
-		label3.setText("you have solved " + wordsSolved + " words");
-
-		frame.pack();
 
 	}
 
@@ -144,6 +155,7 @@ public class Hangman implements KeyListener {
 		} else if (lives > 0) {
 			lives -= 1;
 			if (lives == 0) {
+				wordLabel.setText(word);
 				JOptionPane.showMessageDialog(null, "game over");
 			}
 			label2.setText("you have " + lives + " lives left");
